@@ -29,6 +29,10 @@ npm install
 npm run dev
 ```
 
+### Google Calendar import
+
+Importing events from Google Calendar uses Google's API and requires your domain to be whitelisted in the Google Cloud Console. If you load a calendar feed from a different domain, you may need to proxy the request to work around CORS restrictions.
+
 ## Known issues
 
 See the [FAQ](https://recalendar.me/faq) and [the open issues on GitHub](https://github.com/klimeryk/recalendar.js/issues).

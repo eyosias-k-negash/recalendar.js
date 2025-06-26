@@ -148,16 +148,23 @@
 			"description": "Add your birthdays, celebrations, events, etc. here to get reminders about them in weekly overviews and day pages as they approach.",
 			"empty": "No dates",
 			"placeholder": "What's the occasion?",
-			"upload": {
-				"label": "Import from .ics file:",
-				"loading": "Reading special dates from ICalendar file, please wait...",
-				"error": "Was not able to load some ICalendar events - try re-exporting the .ics file from your calendar app.",
-				"success": "Special dates loaded from ICalendar file."
-			},
-			"type": {
-				"event": "Event",
-				"holiday": "Holiday"
-			},
+                        "upload": {
+                                "label": "Import from .ics file:",
+                                "loading": "Reading special dates from ICalendar file, please wait...",
+                                "error": "Was not able to load some ICalendar events - try re-exporting the .ics file from your calendar app.",
+                                "success": "Special dates loaded from ICalendar file."
+                        },
+                        "google": {
+                                "label": "Import from Google Calendar:",
+                                "button": "Connect and import",
+                                "loading": "Reading events from Google Calendar, please wait...",
+                                "error": "Failed to load events from Google Calendar.",
+                                "success": "Special dates loaded from Google Calendar."
+                        },
+                        "type": {
+                                "event": "Event",
+                                "holiday": "Holiday"
+                        },
 			"button": {
 				"item": "Add date",
 				"remove": "Remove"

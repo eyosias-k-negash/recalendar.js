@@ -14,6 +14,9 @@ import Stack from 'react-bootstrap/Stack';
 import { withTranslation } from 'react-i18next';
 
 import { DATE_FORMAT, HOLIDAY_DAY_TYPE, EVENT_DAY_TYPE } from '~/lib/special-dates-utils';
+import { initGoogleApi, getAccessToken, fetchEvents, extractEventsForYear } from '~/lib/google-calendar';
+
+const GOOGLE_CLIENT_ID = 'REPLACE_WITH_CLIENT_ID';
 
 const STATUS_EMPTY = 'EMPTY';
 const STATUS_LOADING = 'LOADING';
@@ -83,17 +86,36 @@ class SpecialDates extends React.Component {
 		}
 	};
 
-	onFileChange = ( event ) => {
-		this.setState( {
-			status: STATUS_LOADING,
-		} );
+        onFileChange = ( event ) => {
+                this.setState( {
+                        status: STATUS_LOADING,
+                } );
 
 		const file = event.target.files[ 0 ];
 		const reader = new FileReader();
 		reader.onload = this.onFileLoad;
 
-		reader.readAsText( file );
-	};
+                reader.readAsText( file );
+        };
+
+        onGoogleImport = async () => {
+                this.setState( { status: STATUS_LOADING } );
+                try {
+                        await initGoogleApi( GOOGLE_CLIENT_ID );
+                        const token = await getAccessToken();
+                        const nowIso = new Date().toISOString();
+                        const data = await fetchEvents( token, nowIso );
+                        const events = extractEventsForYear( data, this.props.year );
+                        events.forEach( ( { date, summary } ) => {
+                                const key = date.format( DATE_FORMAT );
+                                this.props.onAdd( { date: key, value: summary, type: this.state.icalType } );
+                        } );
+
+                        this.setState( { status: STATUS_SUCCESS } );
+                } catch ( error ) {
+                        this.setState( { status: STATUS_ERROR } );
+                }
+        };
 
 	getGroupedItems() {
 		return this.props.items.reduce( ( itemsSoFar, item ) => {
@@ -259,25 +281,37 @@ class SpecialDates extends React.Component {
 							</Button>
 						</InputGroup>
 					</Stack>
-					<Stack className="mt-3">
-						<Form.Label htmlFor="icsFile">
-							{t( 'configuration.special-dates.upload.label' )}
-						</Form.Label>
-						<Stack direction="horizontal" gap={ 2 }>
-							{this.renderTypeSelect( 'icalType' )}
-							<Form.Control
-								id="icsFile"
-								type="file"
-								accept=".ics"
-								onChange={ this.onFileChange }
-							/>
-						</Stack>
-						{this.renderStatusMessage()}
-					</Stack>
-				</Accordion.Body>
-			</Accordion.Item>
-		);
-	}
+                                        <Stack className="mt-3">
+                                                <Form.Label htmlFor="icsFile">
+                                                        {t( 'configuration.special-dates.upload.label' )}
+                                                </Form.Label>
+                                                <Stack direction="horizontal" gap={ 2 }>
+                                                        {this.renderTypeSelect( 'icalType' )}
+                                                        <Form.Control
+                                                                id="icsFile"
+                                                                type="file"
+                                                                accept=".ics"
+                                                                onChange={ this.onFileChange }
+                                                        />
+                                                </Stack>
+                                                {this.renderStatusMessage()}
+                                        </Stack>
+                                        <Stack className="mt-3">
+                                                <Form.Label>
+                                                        {t( 'configuration.special-dates.google.label' )}
+                                                </Form.Label>
+                                                <Stack direction="horizontal" gap={ 2 }>
+                                                        {this.renderTypeSelect( 'icalType' )}
+                                                        <Button variant="outline-secondary" onClick={ this.onGoogleImport }>
+                                                                {t( 'configuration.special-dates.google.button' )}
+                                                        </Button>
+                                                </Stack>
+                                                {this.renderStatusMessage()}
+                                        </Stack>
+                                </Accordion.Body>
+                        </Accordion.Item>
+                );
+        }
 }
 
 SpecialDates.propTypes = {
